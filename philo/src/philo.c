@@ -6,7 +6,7 @@
 /*   By: aharrass <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/03 22:46:30 by aharrass          #+#    #+#             */
-/*   Updated: 2023/02/11 10:05:18 by aharrass         ###   ########.fr       */
+/*   Updated: 2023/02/12 12:48:55 by aharrass         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,8 +28,8 @@ void	is_dead(t_philo *philo, t_var *var)
 				return ;
 			if (ft_time(philo[i].last_meal_time, var->curr) > var->t_die)
 				return (var->is_alive = 0, gettimeofday(&check, NULL),
-					(void)printf("%5d %d has died\n", ft_time(philo->start, check),
-						philo[i].id));
+					(void)printf("%5d %d has died\n", ft_time(philo->start,
+							check), philo[i].id));
 			pthread_mutex_unlock(&var->death_check);
 			if (!var->is_alive)
 				return ;

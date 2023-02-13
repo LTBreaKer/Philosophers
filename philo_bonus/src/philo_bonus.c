@@ -6,7 +6,7 @@
 /*   By: aharrass <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/10 11:19:04 by aharrass          #+#    #+#             */
-/*   Updated: 2023/02/12 09:44:39 by aharrass         ###   ########.fr       */
+/*   Updated: 2023/02/13 15:46:01 by aharrass         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,19 +21,53 @@ void	initializer(t_var *var, t_philo **philo, sem_t *forks)
 	if (!philo)
 		exit(1);
 	sem_unlink("forks");
+	sem_unlink("death_check");
+	var->death_check = sem_open("death_check", O_CREAT, S_IRWXU, 1);
 	var->ph_id = malloc(sizeof(int) * var->n_philo);
 	if (!var->ph_id)
 		exit(1);
 	while (i < var->n_philo)
 	{
+		(*philo)[i].eat_n = 0;
 		(*philo)[i].var = var;
 		(*philo)[i].id = i + 1;
-		(*philo)[i].fork_pile = forks;
 		i++;
 	}
+	var->fork_pile = forks;
 	var->is_alive = 1;
 	var->av_philo = var->n_philo;
 	return ;
+}
+
+void	*to_do(void *ph)
+{
+	t_philo *philo;
+
+	philo = (t_philo *)ph;
+	if (philo->id % 2)
+		usleep(1000);
+	while (philo->var->is_alive)
+	{
+		ft_eat(philo);
+		if (philo->var->n_eat != -1)
+		philo->eat_n++;
+		sleepnthink(philo);
+	}
+	
+	return (0);
+}
+
+void	philo_manage(t_philo *philo)
+{
+	pthread_t	ph;
+	
+	
+	
+	
+	// exit(0);
+	pthread_create(&ph, NULL, to_do, philo);
+	pthread_detach(ph);
+	while (1);
 }
 
 void	manager(t_var *var)
@@ -44,23 +78,23 @@ void	manager(t_var *var)
 
 	i = 0;
 	philo = 0;
-	forks = sem_open("forks", O_CREAT, 0660, var->n_philo);
+	forks = sem_open("forks", O_CREAT, S_IRWXU, var->n_philo);
 	if (forks == SEM_FAILED)
 		exit(1);
 	initializer(var, &philo, forks);
+	gettimeofday(&var->start, NULL);
 	while (i < var->n_philo)
-	{
+	{	
 		var->ph_id[i] = fork();
 		if (var->ph_id[i] == 0)
-			(printf("hello\n"), exit(0));
-		else
-			i++;
+		{
+			philo_manage(&philo[i]);
+			exit(0);
+		}
+		i++;
+		usleep(50);
 	}
-	while (1)
-	{
-		waitpid(-1, NULL, 0);
-		exit(0);
-	}
+	waitpid(-1, NULL, 0);
 }
 
 int	main(int ac, char **av)

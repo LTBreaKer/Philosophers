@@ -6,7 +6,7 @@
 /*   By: aharrass <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/04 01:35:13 by aharrass          #+#    #+#             */
-/*   Updated: 2023/02/10 16:40:03 by aharrass         ###   ########.fr       */
+/*   Updated: 2023/02/12 12:49:10 by aharrass         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,11 +69,11 @@ void	ft_eat(t_philo *philo)
 	pthread_mutex_lock(&philo->fork[philo->id - 1]);
 	gettimeofday(&(philo->curr), NULL);
 	printf("%5d %d has taken a fork\n", ft_time(philo->start, philo->curr),
-			philo->id);
+		philo->id);
 	pthread_mutex_lock(&philo->fork[philo->id % philo->var->n_philo]);
 	gettimeofday(&(philo->curr), NULL);
 	printf("%5d %d has taken a fork\n", ft_time(philo->start, philo->curr),
-			philo->id);
+		philo->id);
 	pthread_mutex_lock(&philo->var->death_check);
 	gettimeofday(&(philo->last_meal_time), NULL);
 	gettimeofday(&(philo->curr), NULL);

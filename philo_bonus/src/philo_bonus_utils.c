@@ -6,7 +6,7 @@
 /*   By: aharrass <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/11 09:36:40 by aharrass          #+#    #+#             */
-/*   Updated: 2023/02/11 09:39:17 by aharrass         ###   ########.fr       */
+/*   Updated: 2023/02/13 16:00:19 by aharrass         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,4 +71,32 @@ int	is_valid(char **av)
 		i++;
 	}
 	return (0);
+}
+
+int	ft_time(struct timeval start, struct timeval curr)
+{
+	// int	sum;
+
+	// sum = (((curr.tv_sec * 1000) + (curr.tv_usec / 1000)) - ((start.tv_sec
+	// 				* 1000) + (start.tv_usec / 1000)));
+	// return (sum);
+	int	total;
+
+	total = ((curr.tv_sec - start.tv_sec) * 1000) + ((curr.tv_usec
+				- start.tv_usec) / 1000);
+	return (total);
+}
+
+void	ft_wait(int wait_time)
+{
+	struct timeval	t0;
+	struct timeval	t1;
+
+	gettimeofday(&t0, NULL);
+	gettimeofday(&t1, NULL);
+	while (ft_time(t0, t1) < wait_time)
+	{
+		usleep(400);
+		gettimeofday(&t1, NULL);
+	}
 }
