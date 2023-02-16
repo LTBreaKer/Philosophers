@@ -6,7 +6,7 @@
 /*   By: aharrass <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 12:58:50 by aharrass          #+#    #+#             */
-/*   Updated: 2023/02/13 15:21:21 by aharrass         ###   ########.fr       */
+/*   Updated: 2023/02/16 18:18:56 by aharrass         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,11 +22,13 @@ void	ft_eat(t_philo *philo)
 	gettimeofday(&(philo->curr), NULL);
 	printf("%5d %d has taken a fork\n", ft_time(philo->var->start, philo->curr),
 		philo->id);
-	//sem_wait(philo->var->death_check);
-	//gettimeofday(&(philo->last_meal_time), NULL);
+	//usleep(500);
+	sem_wait(philo->var->death_check);
+	gettimeofday(&(philo->last_meal_time), NULL);
 	gettimeofday(&(philo->curr), NULL);
-	printf("%5d %d is eating\n", ft_time(philo->var->start, philo->curr), philo->id);
-	//sem_post(philo->var->death_check);
+	printf("%5d %d is eating\n", ft_time(philo->var->start, philo->curr),
+		philo->id);
+	sem_post(philo->var->death_check);
 	ft_wait(philo->var->t_eat);
 	if (!philo->var->is_alive)
 		return ;
@@ -45,7 +47,29 @@ void	sleepnthink(t_philo *philo)
 		philo->id);
 }
 
-// void	is_dead(t_philo *philo, t_var *var)
-// {
-	
-// }
+void	ft_death(t_var *var)
+{
+	int	i;
+	int	status;
+	int	s;
+
+	i = 0;
+	waitpid(-1, &status, 0);
+	if (WIFEXITED(status))
+	{
+		s = WEXITSTATUS(status);
+		if (s == 0)
+		{
+			while (i < var->n_philo)
+				waitpid(var->ph_id[i++], &status, 0);
+			usleep(500);
+			i = 0;
+		}
+		if (s != 0)
+			(gettimeofday(&var->tf, NULL), printf("%5d %d died\n",
+					ft_time(var->start, var->tf), s));
+		while (i < var->n_philo)
+			kill(var->ph_id[i++], SIGKILL);
+		exit(0);
+	}
+}

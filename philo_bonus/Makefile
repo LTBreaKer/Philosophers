@@ -1,6 +1,6 @@
 NAME = philo_bonus
 
-CFLAGS = -Wall -Wextra -Werror -pthread -fsanitize=thread
+CFLAGS = -Wall -Wextra -Werror -pthread #-fsanitize=thread -g
 
 RM = rm -f
 
@@ -10,9 +10,9 @@ OB_PATH = ./obj/
 
 INCLUDE = -I ./includes
 
-SR =	test.c				\
+SR =	philo_bonus.c				\
 			philo_bonus_utils.c	\
-			more_bonus_utils.c		
+			more_bonus_utils.c	
 
 SRCS = $(addprefix ${SR_PATH}, ${SR})
 

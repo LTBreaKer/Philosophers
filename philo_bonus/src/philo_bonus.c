@@ -6,7 +6,7 @@
 /*   By: aharrass <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/10 11:19:04 by aharrass          #+#    #+#             */
-/*   Updated: 2023/02/13 15:46:01 by aharrass         ###   ########.fr       */
+/*   Updated: 2023/02/16 18:17:22 by aharrass         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,9 +20,11 @@ void	initializer(t_var *var, t_philo **philo, sem_t *forks)
 	*philo = malloc(sizeof(t_philo) * var->n_philo);
 	if (!philo)
 		exit(1);
-	sem_unlink("forks");
-	sem_unlink("death_check");
+	(sem_unlink("forks"), sem_unlink("death_check"), sem_unlink("eat_check"));
+	var->eat_check = sem_open("eat_check", O_CREAT, S_IRWXU, 1);
 	var->death_check = sem_open("death_check", O_CREAT, S_IRWXU, 1);
+	if (var->eat_check == SEM_FAILED || var->death_check == SEM_FAILED)
+		exit(1);
 	var->ph_id = malloc(sizeof(int) * var->n_philo);
 	if (!var->ph_id)
 		exit(1);
@@ -41,7 +43,7 @@ void	initializer(t_var *var, t_philo **philo, sem_t *forks)
 
 void	*to_do(void *ph)
 {
-	t_philo *philo;
+	t_philo	*philo;
 
 	philo = (t_philo *)ph;
 	if (philo->id % 2)
@@ -50,24 +52,30 @@ void	*to_do(void *ph)
 	{
 		ft_eat(philo);
 		if (philo->var->n_eat != -1)
-		philo->eat_n++;
+			philo->eat_n++;
+		if (philo->eat_n == philo->var->n_eat)
+			exit(0);
 		sleepnthink(philo);
 	}
-	
 	return (0);
 }
 
 void	philo_manage(t_philo *philo)
 {
-	pthread_t	ph;
-	
-	
-	
-	
-	// exit(0);
+	pthread_t		ph;
+	struct timeval	curr;
+
+	gettimeofday(&philo->last_meal_time, NULL);
 	pthread_create(&ph, NULL, to_do, philo);
 	pthread_detach(ph);
-	while (1);
+	while (1)
+	{
+		gettimeofday(&curr, NULL);
+		sem_wait(philo->var->death_check);
+		if (ft_time(philo->last_meal_time, curr) > philo->var->t_die)
+			(sem_post(philo->var->death_check), exit(philo->id));
+		sem_post(philo->var->death_check);
+	}
 }
 
 void	manager(t_var *var)
@@ -84,7 +92,7 @@ void	manager(t_var *var)
 	initializer(var, &philo, forks);
 	gettimeofday(&var->start, NULL);
 	while (i < var->n_philo)
-	{	
+	{
 		var->ph_id[i] = fork();
 		if (var->ph_id[i] == 0)
 		{
@@ -92,9 +100,8 @@ void	manager(t_var *var)
 			exit(0);
 		}
 		i++;
-		usleep(50);
 	}
-	waitpid(-1, NULL, 0);
+	ft_death(var);
 }
 
 int	main(int ac, char **av)

@@ -6,7 +6,7 @@
 /*   By: aharrass <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/10 11:19:51 by aharrass          #+#    #+#             */
-/*   Updated: 2023/02/13 15:20:58 by aharrass         ###   ########.fr       */
+/*   Updated: 2023/02/14 13:45:22 by aharrass         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,12 +15,13 @@
 
 # include <pthread.h>
 # include <semaphore.h>
+# include <signal.h>
 # include <stdio.h>
 # include <stdlib.h>
 # include <string.h>
+# include <sys/stat.h>
 # include <sys/time.h>
 # include <unistd.h>
-# include <sys/stat.h> 
 
 typedef struct s_philo
 {
@@ -34,6 +35,7 @@ typedef struct s_philo
 typedef struct s_var
 {
 	struct timeval	start;
+	struct timeval	tf;
 	int				n_philo;
 	int				t_die;
 	int				t_eat;
@@ -42,9 +44,10 @@ typedef struct s_var
 	int				is_alive;
 	int				av_philo;
 	sem_t			*fork_pile;
+	sem_t			*eat_check;
 	int				*ph_id;
 	sem_t			*death_check;
-	
+
 }					t_var;
 
 int					ft_atoi(const char *str);
@@ -53,4 +56,5 @@ void				ft_wait(int wait_time);
 int					ft_time(struct timeval start, struct timeval curr);
 void				ft_eat(t_philo *philo);
 void				sleepnthink(t_philo *philo);
+void				ft_death(t_var *var);
 #endif
