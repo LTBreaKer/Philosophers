@@ -6,7 +6,7 @@
 /*   By: aharrass <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/11 09:36:40 by aharrass          #+#    #+#             */
-/*   Updated: 2023/02/13 16:08:44 by aharrass         ###   ########.fr       */
+/*   Updated: 2023/02/18 20:19:40 by aharrass         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -89,7 +89,7 @@ void	ft_wait(int wait_time)
 
 	gettimeofday(&t0, NULL);
 	gettimeofday(&t1, NULL);
-	while (ft_time(t0, t1) < wait_time)
+	while (ft_time(t0, t1) != wait_time)
 	{
 		usleep(400);
 		gettimeofday(&t1, NULL);
