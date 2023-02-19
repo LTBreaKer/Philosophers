@@ -6,7 +6,7 @@
 /*   By: aharrass <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 12:58:50 by aharrass          #+#    #+#             */
-/*   Updated: 2023/02/19 23:59:22 by aharrass         ###   ########.fr       */
+/*   Updated: 2023/02/20 00:21:44 by aharrass         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,15 +49,16 @@ void	ft_death(t_var *var)
 	int	i;
 	int	status;
 
-	i = -1;
+	i = 1;
 	waitpid(-1, &status, 0);
 	if (WEXITSTATUS(status) == 0)
 	{
-		while (i++ < var->n_philo)
+		while (i < var->n_philo)
 		{
 			waitpid(-1, &status, 0);
 			if (WEXITSTATUS(status) != 0)
 				break ;
+			i++;
 		}
 	}
 	if (WEXITSTATUS(status))
@@ -69,6 +70,5 @@ void	ft_death(t_var *var)
 		printf("%5d %d died\n", ft_time(var->t0, var->tf), WEXITSTATUS(status));
 	}
 	(sem_close(var->fork_pile), sem_close(var->eat_check));
-	sem_close(var->death_check);
-	exit(0);
+	(sem_close(var->death_check), exit(0));
 }

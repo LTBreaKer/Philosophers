@@ -6,7 +6,7 @@
 /*   By: aharrass <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/10 11:19:04 by aharrass          #+#    #+#             */
-/*   Updated: 2023/02/20 00:00:07 by aharrass         ###   ########.fr       */
+/*   Updated: 2023/02/20 00:27:53 by aharrass         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,10 +52,10 @@ void	*to_do(void *ph)
 		ft_eat(philo);
 		if (philo->var->n_eat != -1)
 			philo->eat_n++;
-		usleep(1000);
 		if (philo->eat_n == philo->var->n_eat)
 			exit(0);
 		sleepnthink(philo);
+		usleep(50);
 	}
 	return (0);
 }
@@ -74,7 +74,7 @@ void	philo_manage(t_philo *philo)
 		if (ft_time(philo->last_meal_time, curr) > philo->var->t_die)
 			exit(philo->id);
 		sem_post(philo->var->death_check);
-		usleep(200);
+		usleep(50);
 	}
 }
 
