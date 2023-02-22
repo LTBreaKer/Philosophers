@@ -6,7 +6,7 @@
 /*   By: aharrass <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/10 11:19:04 by aharrass          #+#    #+#             */
-/*   Updated: 2023/02/20 00:27:53 by aharrass         ###   ########.fr       */
+/*   Updated: 2023/02/22 15:20:47 by aharrass         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,8 @@ void	initializer(t_var *var, t_philo **philo, sem_t *forks)
 	*philo = malloc(sizeof(t_philo) * var->n_philo);
 	if (!philo)
 		exit(1);
-	(sem_unlink("death_check"), sem_unlink("eat_check"));
+	(sem_unlink("death_check"), sem_unlink("eat_check"), sem_unlink("print"));
+	var->print = sem_open("print", O_CREAT, S_IRWXU, 1);
 	var->eat_check = sem_open("eat_check", O_CREAT, S_IRWXU, 1);
 	var->death_check = sem_open("death_check", O_CREAT, S_IRWXU, 1);
 	if (var->eat_check == SEM_FAILED)
@@ -124,7 +125,11 @@ int	main(int ac, char **av)
 	var.t_eat = ft_atoi(av[3]);
 	var.t_sleep = ft_atoi(av[4]);
 	if (ac == 6)
+	{
 		var.n_eat = ft_atoi(av[5]);
+		if (var.n_eat < 0)
+			var.n_eat = -1;
+	}
 	if (var.n_philo <= 0 || var.t_die <= 0 || var.t_eat <= 0 || var.t_sleep <= 0
 		|| var.n_eat == 0)
 		return (3);

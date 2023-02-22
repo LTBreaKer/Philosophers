@@ -6,7 +6,7 @@
 /*   By: aharrass <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/10 11:19:51 by aharrass          #+#    #+#             */
-/*   Updated: 2023/02/19 23:54:52 by aharrass         ###   ########.fr       */
+/*   Updated: 2023/02/22 15:07:19 by aharrass         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,6 +46,7 @@ typedef struct s_var
 	int				av_philo;
 	sem_t			*fork_pile;
 	sem_t			*eat_check;
+	sem_t			*print;
 	int				*ph_id;
 	sem_t			*death_check;
 }					t_var;

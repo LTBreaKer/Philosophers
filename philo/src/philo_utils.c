@@ -6,7 +6,7 @@
 /*   By: aharrass <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/04 01:35:13 by aharrass          #+#    #+#             */
-/*   Updated: 2023/02/12 12:49:10 by aharrass         ###   ########.fr       */
+/*   Updated: 2023/02/22 15:02:49 by aharrass         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,20 +68,24 @@ void	ft_eat(t_philo *philo)
 {
 	pthread_mutex_lock(&philo->fork[philo->id - 1]);
 	gettimeofday(&(philo->curr), NULL);
+	pthread_mutex_lock(&philo->var->print_l);
 	printf("%5d %d has taken a fork\n", ft_time(philo->start, philo->curr),
 		philo->id);
+	pthread_mutex_unlock(&philo->var->print_l);
 	pthread_mutex_lock(&philo->fork[philo->id % philo->var->n_philo]);
 	gettimeofday(&(philo->curr), NULL);
+	pthread_mutex_lock(&philo->var->print_l);
 	printf("%5d %d has taken a fork\n", ft_time(philo->start, philo->curr),
 		philo->id);
+	pthread_mutex_unlock(&philo->var->print_l);
 	pthread_mutex_lock(&philo->var->death_check);
 	gettimeofday(&(philo->last_meal_time), NULL);
 	gettimeofday(&(philo->curr), NULL);
+	pthread_mutex_lock(&philo->var->print_l);
 	printf("%5d %d is eating\n", ft_time(philo->start, philo->curr), philo->id);
+	pthread_mutex_unlock(&philo->var->print_l);
 	pthread_mutex_unlock(&philo->var->death_check);
 	ft_wait(philo->var->t_eat);
-	if (!philo->var->is_alive)
-		return ;
 	pthread_mutex_unlock(&philo->fork[philo->id - 1]);
 	pthread_mutex_unlock(&philo->fork[philo->id % philo->var->n_philo]);
 }
@@ -100,6 +104,7 @@ int	make_mutex(pthread_mutex_t **f, t_var **var, t_philo **philo)
 		(*philo)[i].last_meal_time = (*var)->tmp;
 		i++;
 	}
+	pthread_mutex_init(&(*var)->print_l, NULL);
 	if (pthread_mutex_init(&(*var)->eat, NULL) == -1)
 		return (1);
 	if (pthread_mutex_init(&(*var)->death_check, NULL) == -1)

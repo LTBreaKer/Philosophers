@@ -6,7 +6,7 @@
 /*   By: aharrass <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 12:58:50 by aharrass          #+#    #+#             */
-/*   Updated: 2023/02/20 00:21:44 by aharrass         ###   ########.fr       */
+/*   Updated: 2023/02/22 15:32:30 by aharrass         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,17 +16,23 @@ void	ft_eat(t_philo *philo)
 {
 	sem_wait(philo->var->fork_pile);
 	gettimeofday(&(philo->curr), NULL);
+	sem_wait(philo->var->print);
 	printf("%5d %d has taken a fork\n", ft_time(philo->var->t0, philo->curr),
 		philo->id);
+	sem_post(philo->var->print);
 	sem_wait(philo->var->fork_pile);
 	gettimeofday(&(philo->curr), NULL);
+	sem_wait(philo->var->print);
 	printf("%5d %d has taken a fork\n", ft_time(philo->var->t0, philo->curr),
 		philo->id);
+	sem_post(philo->var->print);
 	sem_wait(philo->var->death_check);
 	gettimeofday(&(philo->last_meal_time), NULL);
 	gettimeofday(&(philo->curr), NULL);
+	sem_wait(philo->var->print);
 	printf("%5d %d is eating\n", ft_time(philo->var->t0, philo->curr),
 		philo->id);
+	sem_post(philo->var->print);
 	sem_post(philo->var->death_check);
 	ft_wait(philo->var->t_eat);
 	sem_post(philo->var->fork_pile);
@@ -36,12 +42,16 @@ void	ft_eat(t_philo *philo)
 void	sleepnthink(t_philo *philo)
 {
 	gettimeofday(&(philo->curr), NULL);
+	sem_wait(philo->var->print);
 	printf("%5d %d is sleeping\n", ft_time(philo->var->t0, philo->curr),
 		philo->id);
+	sem_post(philo->var->print);
 	ft_wait(philo->var->t_sleep);
 	gettimeofday(&(philo->curr), NULL);
+	sem_wait(philo->var->print);
 	printf("%5d %d is thinking\n", ft_time(philo->var->t0, philo->curr),
 		philo->id);
+	sem_post(philo->var->print);
 }
 
 void	ft_death(t_var *var)
@@ -64,7 +74,7 @@ void	ft_death(t_var *var)
 	if (WEXITSTATUS(status))
 	{
 		i = 0;
-		gettimeofday(&var->tf, NULL);
+		(gettimeofday(&var->tf, NULL), sem_wait(var->print));
 		while (i < var->n_philo)
 			kill(var->ph_id[i++], SIGKILL);
 		printf("%5d %d died\n", ft_time(var->t0, var->tf), WEXITSTATUS(status));

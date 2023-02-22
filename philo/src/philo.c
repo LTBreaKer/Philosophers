@@ -6,7 +6,7 @@
 /*   By: aharrass <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/03 22:46:30 by aharrass          #+#    #+#             */
-/*   Updated: 2023/02/16 13:21:11 by aharrass         ###   ########.fr       */
+/*   Updated: 2023/02/22 15:04:08 by aharrass         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,22 +17,22 @@ void	is_dead(t_philo *philo, t_var *var)
 	int				i;
 	struct timeval	check;
 
-	while (var->is_alive)
+	while (1)
 	{
 		i = 0;
 		while (i < var->n_philo)
 		{
 			gettimeofday(&var->curr, NULL);
 			pthread_mutex_lock(&var->death_check);
+			pthread_mutex_lock(&var->eat);
 			if (!var->av_philo)
 				return ;
+			pthread_mutex_unlock(&var->eat);
 			if (ft_time(philo[i].last_meal_time, var->curr) > var->t_die)
 				return (var->is_alive = 0, gettimeofday(&check, NULL),
 					(void)printf("%5d %d has died\n", ft_time(philo->start,
 							check), philo[i].id));
 			pthread_mutex_unlock(&var->death_check);
-			if (!var->is_alive)
-				return ;
 			i++;
 		}
 	}
@@ -73,8 +73,12 @@ void	*to_do(void *ph)
 	philo = (t_philo *)ph;
 	if (philo->id % 2)
 		usleep(1500);
-	while (philo->var->av_philo)
+	while (1)
 	{
+		pthread_mutex_lock(&(philo->var->eat));
+		if (philo->var->is_alive == 0)
+			return (0);
+		pthread_mutex_unlock(&(philo->var->eat));
 		ft_eat(philo);
 		if (philo->var->n_eat != -1)
 			philo->eat_n++;
@@ -105,9 +109,12 @@ int	manager(t_var *var)
 	while (i < var->n_philo)
 	{
 		pthread_create(&var->ph[i], NULL, to_do, &philo[i]);
-		pthread_detach(var->ph[i++]);
+		pthread_detach(var->ph[i]);
+		i++;
 	}
 	is_dead(philo, var);
+	pthread_mutex_lock(&philo->var->print_l);
+	usleep(1000000);
 	destroy_mutex(&var, &philo);
 	return (0);
 }
@@ -117,10 +124,7 @@ int	main(int ac, char **av)
 	t_var	var;
 
 	if (ac < 5 || ac > 6)
-	{
-		printf("Error: Invalid arguments");
-		return (1);
-	}
+		return (printf("Error: Invalid arguments"), 1);
 	if (is_valid(av))
 		return (2);
 	var.n_eat = -1;
@@ -129,9 +133,13 @@ int	main(int ac, char **av)
 	var.t_eat = ft_atoi(av[3]);
 	var.t_sleep = ft_atoi(av[4]);
 	if (ac == 6)
+	{
 		var.n_eat = ft_atoi(av[5]);
-	if (var.n_philo <= 0 || var.t_die <= 0 || var.t_eat <= 0
-		|| var.t_sleep <= 0)
+		if (var.n_eat < 0)
+			var.n_eat = -1;
+	}
+	if (var.n_philo <= 0 || var.t_die <= 0 || var.t_eat <= 0 || var.t_sleep <= 0
+		|| var.n_eat == 0)
 		return (3);
 	if (manager(&var))
 		return (4);

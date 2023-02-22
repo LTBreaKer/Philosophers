@@ -6,7 +6,7 @@
 /*   By: aharrass <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/03 23:13:00 by aharrass          #+#    #+#             */
-/*   Updated: 2023/02/10 09:09:49 by aharrass         ###   ########.fr       */
+/*   Updated: 2023/02/22 15:02:21 by aharrass         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,6 +35,7 @@ typedef struct s_var
 {
 	pthread_mutex_t	eat;
 	pthread_mutex_t	death_check;
+	pthread_mutex_t	print_l;
 	int				is_alive;
 	int				n_philo;
 	int				t_die;
